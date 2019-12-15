@@ -18,7 +18,11 @@
 *.iml
 .idea
 
+# Gradle
 .gradle/
+gradlew
+gradlew.bat
+
 build/
 classes/
 generated-sources/

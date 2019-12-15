@@ -1,0 +1,8 @@
+rootProject.name = 'shapranv'
+
+include 'shell:shell-utils'
+include 'app:ryanair-client'
+
+findProject(':shell:shell-utils')?.name = 'shell-utils'
+findProject(':app:ryanair-client')?.name = 'ryanair-client'
+
