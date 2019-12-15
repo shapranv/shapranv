@@ -1,10 +1,22 @@
 package shapranv.shell.utils.application.module;
 
-import lombok.RequiredArgsConstructor;
+import java.util.List;
 
-@RequiredArgsConstructor
-public class ModuleDefinition {
+public interface ModuleDefinition {
 
-    private final String name;
-    private final Class<? extends Module> moduleClass;
+    String getName();
+
+    default Class<? extends Module> getModuleClass() {
+        return null;
+    }
+
+    List<ModuleDefinition> getDependencies();
+
+    default Module moduleInstance() {
+        try {
+            return getModuleClass().newInstance();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Cannot instantiate module for " + getClass().getSimpleName(), e);
+        }
+    }
 }

@@ -1,2 +1,6 @@
 
 apply from: "${rootDir}/build.gradle"
+
+dependencies {
+    compile project(':shell:shell-utils')
+}
