@@ -1,12 +1,21 @@
 package shapranv.shell.utils.application;
 
-import com.sun.istack.internal.Nullable;
-
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Environment {
     private final Map<Class<?>, Object> services = new HashMap<>();
+
+    private static final AtomicReference<Environment> instance = new AtomicReference<>(new Environment());
+
+    private Environment() {
+
+    }
+
+    static Environment getInstance() {
+        return instance.get();
+    }
 
     public <T> void addService(T service, Class<T> type) {
         services.put(type, service);
@@ -21,7 +30,6 @@ public class Environment {
         }
     }
 
-    @Nullable
     @SuppressWarnings("unchecked")
     public <T> T getService(Class<T> type) {
         return (T) services.get(type);
