@@ -2,6 +2,7 @@
 *.class
 
 # Log files
+logs/
 *.log
 *.trace
 
@@ -20,6 +21,7 @@
 
 # Gradle
 .gradle/
+gradle/
 gradlew
 gradlew.bat
 
