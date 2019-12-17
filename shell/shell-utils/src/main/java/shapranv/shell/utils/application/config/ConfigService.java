@@ -7,7 +7,7 @@ import shapranv.shell.utils.collections.CollectionUtils;
 import java.util.Map;
 import java.util.function.Function;
 
-import static shapranv.shell.utils.application.config.ConfigUtils.getSystemProperty;
+import static shapranv.shell.utils.SystemUtils.getSystemProperty;
 
 @Log4j2
 public class ConfigService {

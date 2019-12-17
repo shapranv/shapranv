@@ -10,7 +10,6 @@ public class Environment {
     private static final AtomicReference<Environment> instance = new AtomicReference<>(new Environment());
 
     private Environment() {
-
     }
 
     static Environment getInstance() {
