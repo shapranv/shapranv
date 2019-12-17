@@ -18,6 +18,10 @@ import static shapranv.shell.utils.application.config.ConfigProps.*;
 public class Application {
     static final String ENV_PARAM = "-env";
 
+    static final String APPLICATION_CONFIG_ROOT = "application";
+    static final String APPLICATION_CONFIG_PATH = "/config/";
+
+    static final String COMMON_PROPERTIES = APPLICATION_CONFIG_ROOT + APPLICATION_CONFIG_PATH + "common.properties";
     static final String PROPERTIES_SUFFIX = ".properties";
 
     private static final List<Module> activeModules = new ArrayList<>();
@@ -62,6 +66,8 @@ public class Application {
         String envPath = appParams.get(ENV_PARAM);
         log.info("Loading environment settings from: {}", envPath);
         ConfigUtils.loadConfig(envPath, System::setProperty);
+        log.info("Loading common settings from: {}", COMMON_PROPERTIES);
+        ConfigUtils.loadConfig(COMMON_PROPERTIES, configService::setProperty);
     }
 
     private static void stopApplication() {
