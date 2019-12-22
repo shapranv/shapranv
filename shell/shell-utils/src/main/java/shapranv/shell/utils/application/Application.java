@@ -39,6 +39,12 @@ public class Application {
         System.gc();
 
         //TODO: Implement
+        try {
+            Thread.sleep(25000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        stopApplication();
         System.exit(0);
     }
 
