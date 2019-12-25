@@ -57,7 +57,7 @@ public class ServiceRegistry implements ConsoleListener {
     @Override
     public void printMenu(Consumer<String> printer) {
         for (int i = 0; i < services.size(); i++) {
-            printer.accept(String.valueOf(i + 1) + " " + services.get(i).getName());
+            printer.accept("[" + String.valueOf(i + 1) + "] " + services.get(i).getName());
         }
         printCommandInfo(ConsoleCommand.EXIT, "Quit registry", printer);
     }

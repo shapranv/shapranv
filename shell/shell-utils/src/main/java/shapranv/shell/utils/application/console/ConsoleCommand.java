@@ -7,6 +7,7 @@ public enum ConsoleCommand {
     STATUS("-status", "Print status"),
     START_SERVICE("-start", "Start service"),
     STOP_SERVICE("-stop", "Stop service"),
+    SET_PROPERTY("-property", "Set system property"),
     UNDEF("", "");
 
     private String code;

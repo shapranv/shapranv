@@ -41,6 +41,7 @@ public class ConsoleClient implements ConsoleListener {
     public void printMenu(Consumer<String> printer) {
         printCommandInfo(ConsoleCommand.HELP, printer);
         printCommandInfo(ConsoleCommand.SERVICES, printer);
+        printCommandInfo(ConsoleCommand.SET_PROPERTY, printer);
         printCommandInfo(ConsoleCommand.EXIT, printer);
     }
 }

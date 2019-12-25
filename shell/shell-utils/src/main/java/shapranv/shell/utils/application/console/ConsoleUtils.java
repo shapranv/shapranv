@@ -23,6 +23,6 @@ public class ConsoleUtils {
     }
 
     public static void printCommandInfo(ConsoleCommand command, String description, Consumer<String> printer) {
-        printer.accept(command.getCode() + " " + description);
+        printer.accept("[" + command.getCode() + "] " + description);
     }
 }

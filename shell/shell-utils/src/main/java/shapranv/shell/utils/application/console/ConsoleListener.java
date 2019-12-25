@@ -1,5 +1,7 @@
 package shapranv.shell.utils.application.console;
 
+import shapranv.shell.utils.application.config.ConfigService;
+
 import java.io.BufferedReader;
 import java.util.function.Consumer;
 
@@ -38,6 +40,14 @@ public interface ConsoleListener {
         switch (ConsoleCommand.findByCode(command)) {
             case EXIT:
                 return false;
+            case SET_PROPERTY:
+                printer.accept("Property:");
+                String property = console.readLine();
+                printer.accept("Value:");
+                String value = console.readLine();
+                ConfigService.getInstance().setProperty(property, value);
+                printer.accept("System property updated: " + property + "=" + value);
+                return true;
             case UNDEF:
             case HELP:
                 printHelp(printer);

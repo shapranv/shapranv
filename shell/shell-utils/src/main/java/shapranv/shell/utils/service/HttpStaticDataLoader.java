@@ -93,6 +93,7 @@ public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
         printCommandInfo(ConsoleCommand.STATUS, printer);
         printCommandInfo(ConsoleCommand.START_SERVICE, printer);
         printCommandInfo(ConsoleCommand.STOP_SERVICE, printer);
+        printCommandInfo(ConsoleCommand.SET_PROPERTY, printer);
         printCommandInfo(ConsoleCommand.EXIT, "Quit " + getName(), printer);
     }
 
