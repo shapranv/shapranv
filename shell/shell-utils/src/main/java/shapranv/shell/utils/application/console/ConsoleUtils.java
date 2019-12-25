@@ -2,6 +2,8 @@ package shapranv.shell.utils.application.console;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.function.Consumer;
+
 public class ConsoleUtils {
     public static final String FOOTER_LINE = "------------------------------------------";
 
@@ -14,5 +16,13 @@ public class ConsoleUtils {
         String suffix = StringUtils.repeat("-", suffixLength);
 
         return prefix + " " + serviceName + " " + suffix;
+    }
+
+    public static void printCommandInfo(ConsoleCommand command, Consumer<String> printer) {
+        printCommandInfo(command, command.getDescription(), printer);
+    }
+
+    public static void printCommandInfo(ConsoleCommand command, String description, Consumer<String> printer) {
+        printer.accept(command.getCode() + " " + description);
     }
 }

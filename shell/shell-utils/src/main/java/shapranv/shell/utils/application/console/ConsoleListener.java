@@ -15,7 +15,7 @@ public interface ConsoleListener {
         while (true) {
             try {
                 String command = console.readLine();
-                if(!processCommand(command, printer)) {
+                if(!processCommand(console, command, printer)) {
                     break;
                 }
             } catch (Exception e) {
@@ -34,7 +34,7 @@ public interface ConsoleListener {
         //do nothing
     }
 
-    default boolean processCommand(String command, Consumer<String> printer) throws Exception {
+    default boolean processCommand(BufferedReader console, String command, Consumer<String> printer) throws Exception {
         return false;
     }
 }

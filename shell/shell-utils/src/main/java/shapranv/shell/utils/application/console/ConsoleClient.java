@@ -5,17 +5,17 @@ import shapranv.shell.utils.application.Environment;
 import java.io.BufferedReader;
 import java.util.function.Consumer;
 
+import static shapranv.shell.utils.application.console.ConsoleUtils.printCommandInfo;
+
 public class ConsoleClient implements ConsoleListener {
     private final String appName;
-    private final BufferedReader console;
     private final ServiceRegistry serviceRegistry;
 
-    public ConsoleClient(String appName, BufferedReader console) {
+    public ConsoleClient(String appName) {
         this.appName = appName;
-        this.console = console;
 
         Environment env = Environment.getInstance();
-        this.serviceRegistry = env.getService(ServiceRegistry.class);
+        this.serviceRegistry = env.ensureService(ServiceRegistry.class);
     }
 
     @Override
@@ -24,7 +24,7 @@ public class ConsoleClient implements ConsoleListener {
     }
 
     @Override
-    public boolean processCommand(String code, Consumer<String> printer) throws Exception {
+    public boolean processCommand(BufferedReader console, String code, Consumer<String> printer) throws Exception {
         ConsoleCommand command = ConsoleCommand.findByCode(code);
 
         switch (command) {
@@ -45,10 +45,8 @@ public class ConsoleClient implements ConsoleListener {
 
     @Override
     public void printMenu(Consumer<String> printer) {
-        for (ConsoleCommand command : ConsoleCommand.values()) {
-            if (command != ConsoleCommand.UNDEF) {
-                printer.accept(command.getCode() + " " + command.getDescription());
-            }
-        }
+        printCommandInfo(ConsoleCommand.HELP, printer);
+        printCommandInfo(ConsoleCommand.SERVICES, printer);
+        printCommandInfo(ConsoleCommand.EXIT, printer);
     }
 }

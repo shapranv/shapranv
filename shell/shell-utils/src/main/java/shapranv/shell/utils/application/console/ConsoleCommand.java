@@ -1,9 +1,12 @@
 package shapranv.shell.utils.application.console;
 
-enum ConsoleCommand {
+public enum ConsoleCommand {
     HELP("-h", "Help"),
     SERVICES("-s", "Service registry"),
     EXIT("-q", "Stop application"),
+    STATUS("-status", "Print status"),
+    START_SERVICE("-start", "Start service"),
+    STOP_SERVICE("-stop", "Stop service"),
     UNDEF("", "");
 
     private String code;
@@ -14,7 +17,7 @@ enum ConsoleCommand {
         this.description = description;
     }
 
-    String getCode() {
+    public String getCode() {
         return code;
     }
 
@@ -22,7 +25,7 @@ enum ConsoleCommand {
         return description;
     }
 
-    static ConsoleCommand findByCode(String code) {
+    public static ConsoleCommand findByCode(String code) {
         for (ConsoleCommand command : values()) {
             if (command.code.equals(code)) {
                 return command;

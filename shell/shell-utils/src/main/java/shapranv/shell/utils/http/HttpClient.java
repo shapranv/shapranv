@@ -1,4 +1,4 @@
-package shapranv.ryanair.client.module.http;
+package shapranv.shell.utils.http;
 
 import lombok.extern.log4j.Log4j2;
 import org.apache.http.client.methods.HttpGet;

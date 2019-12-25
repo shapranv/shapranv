@@ -1,10 +1,14 @@
 package shapranv.shell.utils.application.console;
 
 import lombok.extern.log4j.Log4j2;
+import shapranv.shell.utils.service.Service;
 
+import java.io.BufferedReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static shapranv.shell.utils.application.console.ConsoleUtils.printCommandInfo;
 
 @Log4j2
 public class ServiceRegistry implements ConsoleListener {
@@ -20,7 +24,7 @@ public class ServiceRegistry implements ConsoleListener {
     }
 
     @Override
-    public boolean processCommand(String code, Consumer<String> printer) throws Exception {
+    public boolean processCommand(BufferedReader console, String code, Consumer<String> printer) throws Exception {
         ConsoleCommand command = ConsoleCommand.findByCode(code);
 
         switch (command) {
@@ -34,7 +38,10 @@ public class ServiceRegistry implements ConsoleListener {
                     int index = Integer.parseInt(code) - 1;
                     if (index >= 0 && index < services.size()) {
                         Service service = services.get(index);
-                        service.printStatus(System.out::println);
+                        if (service instanceof ConsoleListener) {
+                            ((ConsoleListener) service).listen(console, printer);
+                            printHelp(printer);
+                        }
                         return true;
                     }
                 } catch (NumberFormatException e) {
@@ -56,6 +63,6 @@ public class ServiceRegistry implements ConsoleListener {
         for (int i = 0; i < services.size(); i++) {
             printer.accept(String.valueOf(i + 1) + " " + services.get(i).getName());
         }
-        printer.accept(ConsoleCommand.EXIT.getCode() + " Quit registry");
+        printCommandInfo(ConsoleCommand.EXIT, "Quit registry", printer);
     }
 }

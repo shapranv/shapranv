@@ -78,7 +78,7 @@ public class Application {
 
     private static void startConsoleClient(String appName) {
         BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
-        ConsoleClient consoleClient = new ConsoleClient(appName, console);
+        ConsoleClient consoleClient = new ConsoleClient(appName);
         consoleClient.listen(console, System.out::println);
     }
 
