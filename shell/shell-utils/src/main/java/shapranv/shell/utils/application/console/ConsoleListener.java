@@ -35,6 +35,15 @@ public interface ConsoleListener {
     }
 
     default boolean processCommand(BufferedReader console, String command, Consumer<String> printer) throws Exception {
-        return false;
+        switch (ConsoleCommand.findByCode(command)) {
+            case EXIT:
+                return false;
+            case UNDEF:
+            case HELP:
+                printHelp(printer);
+                break;
+        }
+
+        return true;
     }
 }

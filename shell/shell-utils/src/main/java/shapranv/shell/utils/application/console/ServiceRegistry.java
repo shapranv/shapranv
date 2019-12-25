@@ -28,12 +28,7 @@ public class ServiceRegistry implements ConsoleListener {
         ConsoleCommand command = ConsoleCommand.findByCode(code);
 
         switch (command) {
-            case EXIT:
-                return false;
-            case HELP:
-                printHelp(printer);
-                break;
-            default:
+            case UNDEF:
                 try {
                     int index = Integer.parseInt(code) - 1;
                     if (index >= 0 && index < services.size()) {
@@ -48,9 +43,10 @@ public class ServiceRegistry implements ConsoleListener {
                     //skip
                 }
                 printer.accept("Unknown service...");
+                return true;
         }
 
-        return true;
+        return ConsoleListener.super.processCommand(console, code, printer);
     }
 
     @Override

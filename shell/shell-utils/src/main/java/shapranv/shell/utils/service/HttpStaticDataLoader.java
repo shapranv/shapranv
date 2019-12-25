@@ -101,27 +101,23 @@ public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
         ConsoleCommand command = ConsoleCommand.findByCode(code);
 
         switch (command) {
-            case EXIT:
-                return false;
-            case HELP:
-                printHelp(printer);
-                break;
             case STATUS:
                 printStatus(printer);
-                break;
+                return true;
             case START_SERVICE:
                 start();
                 printStatus(printer);
-                break;
+                return true;
             case STOP_SERVICE:
                 stop();
                 printStatus(printer);
-                break;
-            default:
+                return true;
+            case UNDEF:
                 printer.accept("Unknown command...");
                 printHelp(printer);
+                return true;
         }
 
-        return true;
+        return ConsoleListener.super.processCommand(console, code, printer);
     }
 }

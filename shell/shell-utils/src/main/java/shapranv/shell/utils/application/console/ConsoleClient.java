@@ -28,19 +28,13 @@ public class ConsoleClient implements ConsoleListener {
         ConsoleCommand command = ConsoleCommand.findByCode(code);
 
         switch (command) {
-            case EXIT:
-                return false;
             case SERVICES:
                 serviceRegistry.listen(console, printer);
                 printHelp(printer);
-                break;
-            case HELP:
-            case UNDEF:
-                printHelp(printer);
-                break;
+                return true;
         }
 
-        return true;
+        return ConsoleListener.super.processCommand(console, code, printer);
     }
 
     @Override
