@@ -2,18 +2,17 @@ package shapranv.shell.utils.application;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Environment {
     private final Map<Class<?>, Object> services = new HashMap<>();
 
-    private static final AtomicReference<Environment> instance = new AtomicReference<>(new Environment());
+    private static final Environment instance = new Environment();
 
     private Environment() {
     }
 
-    static Environment getInstance() {
-        return instance.get();
+    public static Environment getInstance() {
+        return instance;
     }
 
     public <T> void addService(T service, Class<T> type) {

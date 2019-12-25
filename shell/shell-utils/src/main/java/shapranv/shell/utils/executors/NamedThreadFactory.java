@@ -33,7 +33,7 @@ public class NamedThreadFactory implements ThreadFactory {
         if (uncaughtExceptionHandler != null) {
             thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
         }
-        logger.info("[{}] thread was created", thread.getName());
+        logger.info("[{}] thread created", thread.getName());
 
         return thread;
     }

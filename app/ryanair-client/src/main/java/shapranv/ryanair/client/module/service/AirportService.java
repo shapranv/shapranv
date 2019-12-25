@@ -4,16 +4,18 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import shapranv.ryanair.client.module.api.domain.Airport;
+import shapranv.shell.utils.application.console.Service;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Log4j2
-public class AirportService {
+public class AirportService implements Service {
     private final ObjectMapper objectMapper;
     private final JavaType inputType;
     private final AtomicReference<Map<String, Airport>> airports = new AtomicReference<>(Collections.emptyMap());
@@ -36,5 +38,15 @@ public class AirportService {
 
         airports.set(update.stream().collect(Collectors.toMap(Airport::getCode, Function.identity())));
         log.error("Airports updated. Cache size: [{}]", airports.get().size());
+    }
+
+    @Override
+    public String getName() {
+        return "Airport service";
+    }
+
+    @Override
+    public void printStatus(Consumer<String> printer) {
+        printer.accept("Airport service: cache size [" + airports.get().size() + "]");
     }
 }

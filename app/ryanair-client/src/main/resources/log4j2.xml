@@ -28,7 +28,6 @@
     <Loggers>
         <Root level="info">
             <appender-ref ref="RootAppender" />
-            <appender-ref ref="STDOUT" />
         </Root>
     </Loggers>
 </Configuration>

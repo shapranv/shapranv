@@ -8,6 +8,7 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.FutureRequestExecutionService;
 import org.apache.http.impl.client.HttpClients;
+import shapranv.shell.utils.executors.NamedThreadFactory;
 
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -22,7 +23,7 @@ public class HttpClient {
         this.httpClient = HttpClients.createMinimal();
         this.executionService = new FutureRequestExecutionService(
                 this.httpClient,
-                Executors.newSingleThreadExecutor()
+                Executors.newFixedThreadPool(1, new NamedThreadFactory("HttpClient"))
         );
     }
 
