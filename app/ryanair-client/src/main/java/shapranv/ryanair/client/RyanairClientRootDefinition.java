@@ -11,7 +11,7 @@ import static shapranv.shell.utils.application.module.ModuleDefinitionFactory.of
 public class RyanairClientRootDefinition implements ModuleDefinition {
     @Override
     public String getName() {
-        return "RyanairClient";
+        return "Ryanair client";
     }
 
     @Override

@@ -3,10 +3,14 @@ package shapranv.shell.utils.application;
 import lombok.extern.log4j.Log4j2;
 import shapranv.shell.utils.application.config.ConfigService;
 import shapranv.shell.utils.application.config.ConfigUtils;
+import shapranv.shell.utils.application.console.ConsoleClient;
+import shapranv.shell.utils.application.console.ServiceRegistry;
 import shapranv.shell.utils.application.module.Module;
 import shapranv.shell.utils.application.module.ModuleDefinition;
 import shapranv.shell.utils.reflection.ReflectionUtils;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,23 +32,24 @@ public class Application {
 
     public static void main(String[] args) {
         try {
-            startApplication(args);
+            ModuleDefinition rootModule = startApplication(args);
             activeModules.forEach(Module::ready);
+            startConsoleClient(rootModule.getName());
+            System.gc();
         } catch (Exception e) {
             log.error("Cannot start application", e);
             stopApplication();
             return;
         }
 
-        System.gc();
-
-        //TODO: Implement
+        stopApplication();
         System.exit(0);
     }
 
-    private static void startApplication(String[] args) {
+    private static ModuleDefinition startApplication(String[] args) {
         Environment env = Environment.getInstance();
         ConfigService configService = ConfigService.getInstance();
+        env.addService(new ServiceRegistry(), ServiceRegistry.class);
 
         Map<String, String> appParams = retrieveAppParams(args);
 
@@ -60,6 +65,7 @@ public class Application {
         }
 
         log.info("{} started", rootModule.getName());
+        return rootModule;
     }
 
     private static void loadConfiguration(ConfigService configService, Map<String, String> appParams) {
@@ -68,6 +74,12 @@ public class Application {
         ConfigUtils.loadConfig(envPath, System::setProperty);
         log.info("Loading common settings from: {}", COMMON_PROPERTIES);
         ConfigUtils.loadConfig(COMMON_PROPERTIES, configService::setProperty);
+    }
+
+    private static void startConsoleClient(String appName) {
+        BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
+        ConsoleClient consoleClient = new ConsoleClient(appName);
+        consoleClient.listen(console, System.out::println);
     }
 
     private static void stopApplication() {
