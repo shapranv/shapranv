@@ -3,6 +3,7 @@ package shapranv.ryanair.client.module.service;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import shapranv.ryanair.client.module.api.domain.Airport;
 import shapranv.shell.utils.service.HttpStaticDataLoader;
 
@@ -13,10 +14,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static shapranv.shell.utils.http.RequestParameter.*;
+
 @Log4j2
 public class AirportService extends HttpStaticDataLoader {
     private final ObjectMapper objectMapper;
     private final JavaType inputType;
+
     private final AtomicReference<Map<String, Airport>> airports = new AtomicReference<>(Collections.emptyMap());
 
     public AirportService() {
@@ -24,6 +28,14 @@ public class AirportService extends HttpStaticDataLoader {
         this.objectMapper = new ObjectMapper();
         this.objectMapper.writerWithDefaultPrettyPrinter();
         this.inputType = objectMapper.getTypeFactory().constructCollectionType(List.class, Airport.class);
+    }
+
+    @Override
+    protected String getHttpRequest() {
+        return requestBuilder.clear()
+                .addParam(PHRASE, StringUtils.EMPTY)
+                .addParam(MARKET, "en-ie")
+                .buildRequest();
     }
 
     @Override

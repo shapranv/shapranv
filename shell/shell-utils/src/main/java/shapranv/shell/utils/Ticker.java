@@ -28,7 +28,7 @@ public class Ticker implements Closeable {
     public void start() {
         long period = interval.get().toMillis();
         this.scheduledFuture = ExecutorFactory.defaultScheduledExecutorService
-                .scheduleAtFixedRate(action, period, period, TimeUnit.MILLISECONDS);
+                .scheduleAtFixedRate(action, 0, period, TimeUnit.MILLISECONDS);
     }
 
     @Override

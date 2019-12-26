@@ -6,6 +6,7 @@ import shapranv.shell.utils.application.config.ConfigService;
 import shapranv.shell.utils.application.console.ConsoleCommand;
 import shapranv.shell.utils.application.console.ConsoleListener;
 import shapranv.shell.utils.http.HttpClient;
+import shapranv.shell.utils.http.RequestBuilder;
 
 import java.io.BufferedReader;
 import java.time.Duration;
@@ -19,22 +20,23 @@ import static shapranv.shell.utils.application.console.ConsoleUtils.printCommand
 @Log4j2
 public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
     private final String configKey;
-    private final String host;
-    private final String request;
     private final HttpClient httpClient;
     private final Ticker ticker;
 
     private final AtomicBoolean isActive = new AtomicBoolean(false);
     private final AtomicReference<LocalDateTime> lastUpdateTime = new AtomicReference<>(null);
 
+    protected final RequestBuilder requestBuilder;
+
     public HttpStaticDataLoader(String configKey) {
         ConfigService config = ConfigService.getInstance();
         this.configKey = configKey;
-        this.host = config.get("service." + configKey + ".http.host");
-        this.request = config.get("service." + configKey + ".http.request");
-
         this.httpClient = new HttpClient();
         this.ticker = new Ticker(this::getTickerPeriod, this::loadData);
+
+        String host = config.get("service." + configKey + ".http.host");
+        String function = config.get("service." + configKey + ".http.function");
+        this.requestBuilder = RequestBuilder.of(host, function);
     }
 
     private Duration getTickerPeriod() {
@@ -45,7 +47,7 @@ public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
 
     private void loadData() {
         try {
-            httpClient.asyncCall(host + request, response -> {
+            httpClient.asyncCall(getHttpRequest(), response -> {
                 refreshCache(response);
                 lastUpdateTime.set(LocalDateTime.now());
             });
@@ -54,6 +56,7 @@ public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
         }
     }
 
+    protected abstract String getHttpRequest();
     protected abstract void refreshCache(String httpResponse);
     protected abstract int getCacheSize();
 
