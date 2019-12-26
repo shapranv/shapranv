@@ -1,6 +1,7 @@
 package shapranv.shell.utils.application.console;
 
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import shapranv.shell.utils.service.Service;
 
 import java.io.BufferedReader;
@@ -25,25 +26,18 @@ public class ServiceRegistry implements ConsoleListener {
 
     @Override
     public boolean processCommand(BufferedReader console, String code, Consumer<String> printer) throws Exception {
-        ConsoleCommand command = ConsoleCommand.findByCode(code);
-
-        switch (command) {
-            case UNDEF:
-                try {
-                    int index = Integer.parseInt(code) - 1;
-                    if (index >= 0 && index < services.size()) {
-                        Service service = services.get(index);
-                        if (service instanceof ConsoleListener) {
-                            ((ConsoleListener) service).listen(console, printer);
-                            printHelp(printer);
-                        }
-                        return true;
-                    }
-                } catch (NumberFormatException e) {
-                    //skip
+        if (StringUtils.isNumeric(code)) {
+            int index = Integer.parseInt(code) - 1;
+            if (index >= 0 && index < services.size()) {
+                Service service = services.get(index);
+                if (service instanceof ConsoleListener) {
+                    ((ConsoleListener) service).listen(console, printer);
+                    printHelp(printer);
                 }
+            } else {
                 printer.accept("Unknown service...");
-                return true;
+            }
+            return true;
         }
 
         return ConsoleListener.super.processCommand(console, code, printer);

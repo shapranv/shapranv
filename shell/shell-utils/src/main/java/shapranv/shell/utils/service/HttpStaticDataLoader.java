@@ -1,5 +1,6 @@
 package shapranv.shell.utils.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import shapranv.shell.utils.Ticker;
 import shapranv.shell.utils.application.config.ConfigService;
@@ -12,6 +13,7 @@ import java.io.BufferedReader;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -27,6 +29,9 @@ public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
     private final AtomicReference<LocalDateTime> lastUpdateTime = new AtomicReference<>(null);
 
     protected final RequestBuilder requestBuilder;
+    protected final ObjectMapper objectMapper;
+
+    private final AtomicLong requestId = new AtomicLong(0);
 
     public HttpStaticDataLoader(String configKey) {
         ConfigService config = ConfigService.getInstance();
@@ -34,9 +39,12 @@ public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
         this.httpClient = new HttpClient();
         this.ticker = new Ticker(this::getTickerPeriod, this::loadData);
 
-        String host = config.get("service." + configKey + ".http.host");
+        String host = config.get("service." + configKey + ".http.host", config.get("service.default.http.host"));
         String function = config.get("service." + configKey + ".http.function");
         this.requestBuilder = RequestBuilder.of(host, function);
+
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.writerWithDefaultPrettyPrinter();
     }
 
     private Duration getTickerPeriod() {
@@ -45,10 +53,11 @@ public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
         return Duration.parse(refreshPeriod);
     }
 
-    private void loadData() {
+    protected void loadData() {
         try {
-            httpClient.asyncCall(getHttpRequest(), response -> {
-                refreshCache(response);
+            long requestId = this.requestId.incrementAndGet();
+            httpClient.asyncCall(requestId, getHttpRequest(requestId), (id, response) -> {
+                refreshCache(id, response);
                 lastUpdateTime.set(LocalDateTime.now());
             });
         } catch (Exception e) {
@@ -56,8 +65,10 @@ public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
         }
     }
 
-    protected abstract String getHttpRequest();
-    protected abstract void refreshCache(String httpResponse);
+    protected abstract String getHttpRequest(long requestId);
+
+    protected abstract void refreshCache(long requestId, String httpResponse);
+
     protected abstract int getCacheSize();
 
     @Override
@@ -80,8 +91,8 @@ public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
     public void printStatus(Consumer<String> printer) {
         printer.accept(
                 "Service status: active [" + isActive.get() + "], " +
-                "cache size [" + getCacheSize() + "], " +
-                "last updated [" + (lastUpdateTime.get() == null ? "" : lastUpdateTime.get()) + "]"
+                        "cache size [" + getCacheSize() + "], " +
+                        "last updated [" + (lastUpdateTime.get() == null ? "" : lastUpdateTime.get()) + "]"
         );
     }
 

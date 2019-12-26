@@ -26,6 +26,10 @@ public class ConfigService {
         return get(name, EMPTY_MAPPER, null);
     }
 
+    public String get(String name, String defaultValue) {
+        return get(name, EMPTY_MAPPER, defaultValue);
+    }
+
     public boolean getBoolean(String name) {
         return getBoolean(name, false);
     }
