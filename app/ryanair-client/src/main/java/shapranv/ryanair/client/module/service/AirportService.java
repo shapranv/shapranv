@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import shapranv.ryanair.client.module.api.domain.Airport;
+import shapranv.shell.utils.collections.CollectionUtils;
 import shapranv.shell.utils.service.HttpStaticDataLoader;
 
 import java.util.*;
@@ -19,7 +20,7 @@ public class AirportService extends HttpStaticDataLoader {
     private final JavaType inputType;
 
     private final AtomicReference<Map<String, Airport>> airports = new AtomicReference<>(Collections.emptyMap());
-    private final Set<Consumer<Map<String, Airport>>> updateListeners = new HashSet<>();
+    private final Set<Consumer<Map<String, Airport>>> updateListeners = CollectionUtils.setFromConcurrentMap();
 
     public AirportService() {
         super("airports");
