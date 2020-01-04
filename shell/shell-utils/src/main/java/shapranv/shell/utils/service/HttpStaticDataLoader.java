@@ -1,5 +1,6 @@
 package shapranv.shell.utils.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import shapranv.shell.utils.Ticker;
@@ -45,6 +46,7 @@ public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
 
         this.objectMapper = new ObjectMapper();
         this.objectMapper.writerWithDefaultPrettyPrinter();
+        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     private Duration getTickerPeriod() {

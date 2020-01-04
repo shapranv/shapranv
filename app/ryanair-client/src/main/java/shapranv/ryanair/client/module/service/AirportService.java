@@ -35,7 +35,7 @@ public class AirportService extends HttpStaticDataLoader {
     protected String getHttpRequest(long requestId) {
         return requestBuilder.clear()
                 .addParam(PHRASE, StringUtils.EMPTY)
-                .addParam(MARKET, "en-ie")
+                .addParam(MARKET, "en-ie") //TODO: Move to settings?
                 .buildRequest();
     }
 
@@ -67,5 +67,9 @@ public class AirportService extends HttpStaticDataLoader {
     @Override
     protected int getCacheSize() {
         return airports.get().size();
+    }
+
+    public Set<String> getAllAirportCodes() {
+        return airports.get().keySet();
     }
 }

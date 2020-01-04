@@ -16,6 +16,9 @@ public class RequestBuilder {
     private final String host;
     private final String function;
 
+    private Map<Integer, String> integerToStringCache = CollectionUtils.concurrentMap();
+    private Map<Boolean, String> booleanToStringCache = CollectionUtils.concurrentMap();
+
     @Setter
     private Map<String, String> params = CollectionUtils.concurrentMap();
 
@@ -27,8 +30,29 @@ public class RequestBuilder {
         return addParam(param.getName(), value);
     }
 
+    public RequestBuilder addParam(RequestParameter param, int value) {
+        return addParam(param.getName(), value);
+    }
+
+    public RequestBuilder addParam(RequestParameter param, boolean value) {
+        return addParam(param.getName(), value);
+    }
+
     public RequestBuilder addParam(String name, String value) {
         params.put(name, StringUtils.defaultString(value));
+        return this;
+    }
+
+    public RequestBuilder addParam(String name, int value) {
+        String stringValue = value > -100 && value < 100
+                ? integerToStringCache.computeIfAbsent(value, String::valueOf)
+                : String.valueOf(value);
+        params.put(name, stringValue);
+        return this;
+    }
+
+    public RequestBuilder addParam(String name, boolean value) {
+        params.put(name, booleanToStringCache.computeIfAbsent(value, String::valueOf));
         return this;
     }
 

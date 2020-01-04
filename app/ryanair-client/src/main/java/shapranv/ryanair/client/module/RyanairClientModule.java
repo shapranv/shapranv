@@ -2,6 +2,7 @@ package shapranv.ryanair.client.module;
 
 import lombok.extern.log4j.Log4j2;
 import shapranv.ryanair.client.module.service.AirportService;
+import shapranv.ryanair.client.module.service.AvailabilityService;
 import shapranv.ryanair.client.module.service.RouteService;
 import shapranv.shell.utils.application.Environment;
 import shapranv.shell.utils.application.console.ServiceRegistry;
@@ -11,6 +12,7 @@ import shapranv.shell.utils.application.module.Module;
 public class RyanairClientModule implements Module {
     private AirportService airportService;
     private RouteService routeService;
+    private AvailabilityService availabilityService;
 
     @Override
     public void start(Environment env) {
@@ -22,6 +24,10 @@ public class RyanairClientModule implements Module {
         this.routeService = new RouteService();
         serviceRegistry.register(routeService);
         airportService.addUpdateListener(routeService::onAirportsUpdated);
+
+        this.availabilityService = new AvailabilityService(airportService, routeService);
+        serviceRegistry.register(availabilityService);
+        routeService.addUpdateListener(availabilityService::onRoutesUpdated);
 
         String request =
         "/api/locate/v1/autocomplete/airports?phrase=&market=en-ie";
@@ -40,9 +46,11 @@ public class RyanairClientModule implements Module {
 
     @Override
     public void stop() {
-        if (airportService != null) {
+        if (availabilityService != null) {
+            //TODO: Move to ServiceRegistry?
             airportService.stop();
             routeService.stop();
+            availabilityService.stop();
         }
     }
 }
