@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 import static shapranv.shell.utils.application.console.ConsoleUtils.printCommandInfo;
 
 @Log4j2
-public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
+public abstract class HttpDataLoader implements Service, ConsoleListener {
     private final String configKey;
     private final HttpClient httpClient;
     private final Ticker ticker;
@@ -34,7 +34,7 @@ public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
 
     private final AtomicLong requestId = new AtomicLong(0);
 
-    public HttpStaticDataLoader(String configKey) {
+    public HttpDataLoader(String configKey) {
         ConfigService config = ConfigService.getInstance();
         this.configKey = configKey;
         this.httpClient = new HttpClient();

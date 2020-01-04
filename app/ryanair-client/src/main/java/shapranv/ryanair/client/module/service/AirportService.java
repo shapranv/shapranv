@@ -5,7 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import shapranv.ryanair.client.module.api.domain.Airport;
 import shapranv.shell.utils.collections.CollectionUtils;
-import shapranv.shell.utils.service.HttpStaticDataLoader;
+import shapranv.shell.utils.service.HttpDataLoader;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import static shapranv.shell.utils.http.RequestParameter.*;
 
 @Log4j2
-public class AirportService extends HttpStaticDataLoader {
+public class AirportService extends HttpDataLoader {
     private final JavaType inputType;
 
     private final AtomicReference<Map<String, Airport>> airports = new AtomicReference<>(Collections.emptyMap());

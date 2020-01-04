@@ -5,7 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import shapranv.ryanair.client.module.api.domain.availability.AvailabilityResponse;
 import shapranv.shell.utils.collections.CollectionUtils;
-import shapranv.shell.utils.service.HttpStaticDataLoader;
+import shapranv.shell.utils.service.HttpDataLoader;
 
 import java.util.Map;
 import java.util.Queue;
@@ -14,7 +14,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import static shapranv.shell.utils.http.RequestParameter.*;
 
 @Log4j2
-public class AvailabilityService extends HttpStaticDataLoader {
+public class AvailabilityService extends HttpDataLoader {
     private final AirportService airportService;
     private final RouteService routeService;
 

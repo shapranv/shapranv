@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import shapranv.ryanair.client.module.api.domain.Airport;
 import shapranv.ryanair.client.module.api.domain.Route;
 import shapranv.shell.utils.collections.CollectionUtils;
-import shapranv.shell.utils.service.HttpStaticDataLoader;
+import shapranv.shell.utils.service.HttpDataLoader;
 
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -14,7 +14,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import static shapranv.shell.utils.http.RequestParameter.*;
 
 @Log4j2
-public class RouteService extends HttpStaticDataLoader {
+public class RouteService extends HttpDataLoader {
     private final JavaType inputType;
 
     private final Map<String, List<Route>> routes = CollectionUtils.concurrentMap();
