@@ -26,7 +26,7 @@ public class AvailabilityService extends HttpDataLoader {
     private final Map<Long, String> currentlyLoading = CollectionUtils.concurrentMap();
 
     public AvailabilityService(AirportService airportService, RouteService routeService) {
-        super("flights");
+        super("availability");
         this.airportService = airportService;
         this.routeService = routeService;
         this.inputType = objectMapper.getTypeFactory().constructType(AvailabilityResponse.class);
@@ -34,7 +34,7 @@ public class AvailabilityService extends HttpDataLoader {
 
     @Override
     public String getName() {
-        return "Flights service";
+        return "Availability service";
     }
 
     public void onRoutesUpdated() {
@@ -42,14 +42,14 @@ public class AvailabilityService extends HttpDataLoader {
             airportService.getAllAirportCodes().forEach(airportsToLoad::offer);
             start();
         } else {
-            log.warn("Flights are still loading. Skipping update...");
+            log.warn("Flight availability is still loading. Skipping update...");
         }
     }
 
     @Override
     protected void loadData() {
         if (airportsToLoad.isEmpty() && routesToLoad.isEmpty() && currentlyLoading.isEmpty()) {
-            log.warn("Flights loaded. Stopping service...");
+            log.warn("Flight availability loaded. Stopping service...");
             stop();
         } else {
             super.loadData();

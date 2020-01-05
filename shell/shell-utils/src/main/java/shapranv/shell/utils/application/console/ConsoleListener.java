@@ -36,6 +36,10 @@ public interface ConsoleListener {
         //do nothing
     }
 
+    default void printStatus(Consumer<String> printer) {
+        //do nothing
+    }
+
     default boolean processCommand(BufferedReader console, String command, Consumer<String> printer) throws Exception {
         switch (ConsoleCommand.findByCode(command)) {
             case EXIT:

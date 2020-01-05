@@ -35,7 +35,7 @@ public class HttpClient {
             @Override
             public void completed(String result) {
                 log.info("Http request completed: {}", uri);
-                log.info("Http response received: {}", result);
+                log.debug("Http response received: {}", result);
                 consumer.accept(requestId, result);
             }
 

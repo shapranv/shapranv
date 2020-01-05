@@ -9,7 +9,6 @@ import shapranv.shell.utils.service.HttpDataLoader;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -20,14 +19,14 @@ public class AirportService extends HttpDataLoader {
     private final JavaType inputType;
 
     private final AtomicReference<Map<String, Airport>> airports = new AtomicReference<>(Collections.emptyMap());
-    private final Set<Consumer<Map<String, Airport>>> updateListeners = CollectionUtils.setFromConcurrentMap();
+    private final Set<Runnable> updateListeners = CollectionUtils.setFromConcurrentMap();
 
     public AirportService() {
         super("airports");
         this.inputType = objectMapper.getTypeFactory().constructCollectionType(List.class, Airport.class);
     }
 
-    public void addUpdateListener(Consumer<Map<String, Airport>> updateListener) {
+    public void addUpdateListener(Runnable updateListener) {
         this.updateListeners.add(updateListener);
     }
 
@@ -56,7 +55,7 @@ public class AirportService extends HttpDataLoader {
 
         airports.set(update.stream().collect(Collectors.toMap(Airport::getCode, Function.identity())));
         log.info("Airports updated. Cache size: [{}]", airports.get().size());
-        updateListeners.forEach(listener -> listener.accept(airports.get()));
+        updateListeners.forEach(Runnable::run);
     }
 
     @Override
@@ -71,5 +70,6 @@ public class AirportService extends HttpDataLoader {
 
     public Set<String> getAllAirportCodes() {
         return airports.get().keySet();
+        //return Collections.singleton("KRK");
     }
 }

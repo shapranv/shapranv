@@ -3,6 +3,7 @@ package shapranv.shell.utils.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import shapranv.shell.utils.Ticker;
 import shapranv.shell.utils.application.config.ConfigService;
 import shapranv.shell.utils.application.console.ConsoleCommand;
@@ -58,7 +59,14 @@ public abstract class HttpDataLoader implements Service, ConsoleListener {
     protected void loadData() {
         try {
             long requestId = this.requestId.incrementAndGet();
-            httpClient.asyncCall(requestId, getHttpRequest(requestId), (id, response) -> {
+            String request = getHttpRequest(requestId);
+
+            if (StringUtils.isBlank(request)) {
+                log.info("Request is empty. Skipping...");
+                return;
+            }
+
+            httpClient.asyncCall(requestId, request, (id, response) -> {
                 refreshCache(id, response);
                 lastUpdateTime.set(LocalDateTime.now());
             });
@@ -67,6 +75,7 @@ public abstract class HttpDataLoader implements Service, ConsoleListener {
         }
     }
 
+    //TODO: Upgrade String->Object
     protected abstract String getHttpRequest(long requestId);
 
     protected abstract void refreshCache(long requestId, String httpResponse);

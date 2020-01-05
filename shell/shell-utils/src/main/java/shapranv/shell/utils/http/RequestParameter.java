@@ -25,7 +25,10 @@ public enum RequestParameter {
     FLEX_DAYS_BEFORE_OUT("FlexDaysBeforeOut"),
     TO_US("ToUs"),
     PROMO_CODE("promoCode"),
-    INCLUDE_CONNECTING_FLIGHTS("IncludeConnectingFlights");
+    INCLUDE_CONNECTING_FLIGHTS("IncludeConnectingFlights"),
+
+    INBOUND_MONTH_OF_DATE("inboundMonthOfDate"),
+    OUTBOUND_MONTH_OF_DATE("outboundMonthOfDate");
 
     @Getter
     private final String name;

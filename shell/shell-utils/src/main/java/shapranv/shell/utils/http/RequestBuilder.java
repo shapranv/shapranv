@@ -15,6 +15,7 @@ public class RequestBuilder {
 
     private final String host;
     private final String function;
+    private String requestSuffix;
 
     private Map<Integer, String> integerToStringCache = CollectionUtils.concurrentMap();
     private Map<Boolean, String> booleanToStringCache = CollectionUtils.concurrentMap();
@@ -24,6 +25,11 @@ public class RequestBuilder {
 
     public static RequestBuilder of(String host, String function) {
         return new RequestBuilder(host, function);
+    }
+
+    public RequestBuilder requestSuffix(String requestSuffix) {
+        this.requestSuffix = requestSuffix;
+        return this;
     }
 
     public RequestBuilder addParam(RequestParameter param, String value) {
@@ -65,6 +71,10 @@ public class RequestBuilder {
         StringBuilder builder = cachedBuilder.getBuilder()
                 .append(host)
                 .append(function);
+
+        if (StringUtils.isNotEmpty(requestSuffix)) {
+            builder.append(requestSuffix);
+        }
 
         AtomicBoolean isFirst = new AtomicBoolean(true);
         params.keySet().forEach(param -> {
