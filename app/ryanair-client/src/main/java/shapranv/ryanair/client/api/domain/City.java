@@ -1,9 +1,9 @@
-package shapranv.ryanair.client.module.api.domain;
+package shapranv.ryanair.client.api.domain;
 
 import lombok.Data;
 
 @Data
-public class Country {
+public class City {
     private String code;
     private String name;
 }

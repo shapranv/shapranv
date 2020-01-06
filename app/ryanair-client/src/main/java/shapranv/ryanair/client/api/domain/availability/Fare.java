@@ -1,4 +1,4 @@
-package shapranv.ryanair.client.module.api.domain.availability;
+package shapranv.ryanair.client.api.domain.availability;
 
 import lombok.Data;
 

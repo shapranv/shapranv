@@ -1,9 +1,9 @@
-package shapranv.ryanair.client.module.service;
+package shapranv.ryanair.client.service;
 
 import com.fasterxml.jackson.databind.JavaType;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
-import shapranv.ryanair.client.module.api.domain.availability.AvailabilityResponse;
+import shapranv.ryanair.client.api.domain.availability.AvailabilityResponse;
 import shapranv.shell.utils.collections.CollectionUtils;
 import shapranv.shell.utils.service.HttpDataLoader;
 

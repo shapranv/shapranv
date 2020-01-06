@@ -1,4 +1,4 @@
-package shapranv.ryanair.client.module.api.domain.fares;
+package shapranv.ryanair.client.api.domain.fares;
 
 import lombok.Data;
 

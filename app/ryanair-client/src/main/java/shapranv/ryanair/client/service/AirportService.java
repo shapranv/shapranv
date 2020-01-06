@@ -1,9 +1,9 @@
-package shapranv.ryanair.client.module.service;
+package shapranv.ryanair.client.service;
 
 import com.fasterxml.jackson.databind.JavaType;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
-import shapranv.ryanair.client.module.api.domain.Airport;
+import shapranv.ryanair.client.api.domain.Airport;
 import shapranv.shell.utils.collections.CollectionUtils;
 import shapranv.shell.utils.service.HttpDataLoader;
 
@@ -68,8 +68,13 @@ public class AirportService extends HttpDataLoader {
         return airports.get().size();
     }
 
+    public Airport getAirport(String code) {
+        return airports.get().get(code);
+    }
+
     public Set<String> getAllAirportCodes() {
         return airports.get().keySet();
+        //TODO: Used for tests
         //return Collections.singleton("KRK");
     }
 }
