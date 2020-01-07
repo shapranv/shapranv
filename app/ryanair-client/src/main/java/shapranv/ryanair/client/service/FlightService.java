@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import shapranv.ryanair.client.api.domain.fares.Fare;
 import shapranv.ryanair.client.api.domain.fares.MonthFares;
 import shapranv.shell.utils.collections.CollectionUtils;
@@ -14,7 +15,6 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 
 import static shapranv.shell.utils.http.RequestParameter.*;
 
@@ -142,16 +142,16 @@ public class FlightService extends HttpDataLoader {
     }
 
     @Override
-    public void printStatus(Consumer<String> printer) {
-        super.printStatus(printer);
+    public void printStatus(Logger logger) {
+        super.printStatus(logger);
 
         int total = routeService.getCacheSize();
         int loaded = context.loadedFaresCounter.get();
 
         if (loaded < total) {
-            printer.accept("Loading progress: " + (int)(((double)loaded / total) * 100) + "% [" + loaded + "/" + total + "]");
+            logger.info("Loading progress: {}% [{}/{}]", (int)(((double)loaded / total) * 100), loaded, total);
         } else {
-            printer.accept("Loading finished: [" + loaded + "/" + total + "]");
+            logger.info("Loading finished: [{}/{}]", loaded, total);
         }
     }
 

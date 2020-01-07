@@ -21,11 +21,15 @@
         </RollingFile>
 
         <Console name="STDOUT" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1}: %msg%n" />
+            <PatternLayout pattern="%msg%n" />
         </Console>
     </Appenders>
 
     <Loggers>
+        <Logger name="ConsoleLogger" level="info">
+            <appender-ref ref="STDOUT" />
+        </Logger>
+
         <Root level="info">
             <appender-ref ref="RootAppender" />
         </Root>
