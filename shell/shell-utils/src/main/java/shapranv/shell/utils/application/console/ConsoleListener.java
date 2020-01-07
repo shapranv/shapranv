@@ -1,17 +1,28 @@
 package shapranv.shell.utils.application.console;
 
 import org.apache.logging.log4j.Logger;
-import shapranv.shell.utils.application.config.ConfigService;
+import shapranv.shell.utils.application.console.command.ConsoleCommand;
 
 import java.io.BufferedReader;
+import java.util.List;
 
 import static shapranv.shell.utils.application.console.ConsoleUtils.FOOTER_LINE;
 import static shapranv.shell.utils.application.console.ConsoleUtils.getHeader;
+import static shapranv.shell.utils.application.console.ConsoleUtils.printCommandInfo;
+import static shapranv.shell.utils.application.console.command.SystemCommands.*;
 
-public interface ConsoleListener {
-    String getName();
+public abstract class ConsoleListener {
+    private final List<ConsoleCommand> commands;
 
-    default void listen(BufferedReader console, Logger logger) {
+    protected ConsoleListener() {
+        this.commands = createCommands();
+    }
+
+    protected abstract String getName();
+
+    protected abstract List<ConsoleCommand> createCommands();
+
+    public void listen(BufferedReader console, Logger logger) {
         printHelp(logger);
 
         while (true) {
@@ -26,38 +37,21 @@ public interface ConsoleListener {
         }
     }
 
-    default void printHelp(Logger logger) {
+    public void printHelp(Logger logger) {
         logger.info(getHeader(getName()));
         printMenu(logger);
         logger.info(FOOTER_LINE);
     }
 
-    default void printMenu(Logger logger) {
-        //do nothing
+    protected void printMenu(Logger logger) {
+        commands.forEach(command -> printCommandInfo(command, logger));
     }
 
-    default void printStatus(Logger logger) {
-        //do nothing
+    protected boolean processCommand(BufferedReader console, String command, Logger logger) throws Exception {
+        return findCommand(command).execute(this, console, logger);
     }
 
-    default boolean processCommand(BufferedReader console, String command, Logger logger) throws Exception {
-        switch (ConsoleCommand.findByCode(command)) {
-            case EXIT:
-                return false;
-            case SET_PROPERTY:
-                logger.info("Property:");
-                String property = console.readLine();
-                logger.info("Value:");
-                String value = console.readLine();
-                ConfigService.getInstance().setProperty(property, value);
-                logger.info("System property updated: " + property + "=" + value);
-                return true;
-            case UNDEF:
-            case HELP:
-                printHelp(logger);
-                break;
-        }
-
-        return true;
+    private ConsoleCommand findCommand(String code) {
+        return commands.stream().filter(command -> code.equals(command.getCode())).findFirst().orElse(UNDEF);
     }
 }
