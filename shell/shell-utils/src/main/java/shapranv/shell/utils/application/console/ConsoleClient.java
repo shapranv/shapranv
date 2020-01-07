@@ -2,12 +2,14 @@ package shapranv.shell.utils.application.console;
 
 import org.apache.logging.log4j.Logger;
 import shapranv.shell.utils.application.Environment;
+import shapranv.shell.utils.application.console.command.ConsoleCommand;
+import shapranv.shell.utils.application.console.command.SystemCommands;
 
 import java.io.BufferedReader;
+import java.util.Arrays;
+import java.util.List;
 
-import static shapranv.shell.utils.application.console.ConsoleUtils.printCommandInfo;
-
-public class ConsoleClient implements ConsoleListener {
+public class ConsoleClient extends ConsoleListener {
     private final String appName;
     private final ServiceRegistry serviceRegistry;
 
@@ -24,24 +26,19 @@ public class ConsoleClient implements ConsoleListener {
     }
 
     @Override
-    public boolean processCommand(BufferedReader console, String code, Logger logger) throws Exception {
-        ConsoleCommand command = ConsoleCommand.findByCode(code);
-
-        switch (command) {
-            case SERVICES:
-                serviceRegistry.listen(console, logger);
-                printHelp(logger);
-                return true;
-        }
-
-        return ConsoleListener.super.processCommand(console, code, logger);
-    }
-
-    @Override
-    public void printMenu(Logger logger) {
-        printCommandInfo(ConsoleCommand.HELP, logger);
-        printCommandInfo(ConsoleCommand.SERVICES, logger);
-        printCommandInfo(ConsoleCommand.SET_PROPERTY, logger);
-        printCommandInfo(ConsoleCommand.EXIT, logger);
+    protected List<ConsoleCommand> createCommands() {
+        return Arrays.asList(
+                SystemCommands.HELP,
+                new ConsoleCommand("-s", "Service registry") {
+                    @Override
+                    public boolean execute(ConsoleListener listener, BufferedReader console, Logger logger) throws Exception {
+                        serviceRegistry.listen(console, logger);
+                        printHelp(logger);
+                        return true;
+                    }
+                },
+                SystemCommands.SET_PROPERTY,
+                SystemCommands.EXIT
+        );
     }
 }

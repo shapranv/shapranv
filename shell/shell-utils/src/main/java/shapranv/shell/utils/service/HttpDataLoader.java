@@ -7,22 +7,24 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import shapranv.shell.utils.Ticker;
 import shapranv.shell.utils.application.config.ConfigService;
-import shapranv.shell.utils.application.console.ConsoleCommand;
+import shapranv.shell.utils.application.console.command.ConsoleCommand;
 import shapranv.shell.utils.application.console.ConsoleListener;
+import shapranv.shell.utils.application.console.command.Exit;
+import shapranv.shell.utils.application.console.command.SystemCommands;
 import shapranv.shell.utils.http.HttpClient;
 import shapranv.shell.utils.http.RequestBuilder;
 
 import java.io.BufferedReader;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static shapranv.shell.utils.application.console.ConsoleUtils.printCommandInfo;
-
 @Log4j2
-public abstract class HttpDataLoader implements Service, ConsoleListener {
+public abstract class HttpDataLoader extends ConsoleListener implements Service {
     private final String configKey;
     private final HttpClient httpClient;
     private final Ticker ticker;
@@ -98,8 +100,7 @@ public abstract class HttpDataLoader implements Service, ConsoleListener {
         }
     }
 
-    @Override
-    public void printStatus(Logger logger) {
+    protected void printStatus(Logger logger) {
         logger.info("Service status: active [{}], cache size [{}], last updated [{}]",
                 isActive.get(), getCacheSize(), (lastUpdateTime.get() == null ? "" : lastUpdateTime.get())
         );
@@ -107,41 +108,39 @@ public abstract class HttpDataLoader implements Service, ConsoleListener {
 
     @Override
     public void printHelp(Logger logger) {
-        ConsoleListener.super.printHelp(logger);
+        super.printHelp(logger);
         printStatus(logger);
     }
 
     @Override
-    public void printMenu(Logger logger) {
-        printCommandInfo(ConsoleCommand.STATUS, logger);
-        printCommandInfo(ConsoleCommand.START_SERVICE, logger);
-        printCommandInfo(ConsoleCommand.STOP_SERVICE, logger);
-        printCommandInfo(ConsoleCommand.SET_PROPERTY, logger);
-        printCommandInfo(ConsoleCommand.EXIT, "Quit " + getName(), logger);
-    }
-
-    @Override
-    public boolean processCommand(BufferedReader console, String code, Logger logger) throws Exception {
-        ConsoleCommand command = ConsoleCommand.findByCode(code);
-
-        switch (command) {
-            case STATUS:
-                printStatus(logger);
-                return true;
-            case START_SERVICE:
-                start();
-                printStatus(logger);
-                return true;
-            case STOP_SERVICE:
-                stop();
-                printStatus(logger);
-                return true;
-            case UNDEF:
-                logger.info("Unknown command...");
-                printHelp(logger);
-                return true;
-        }
-
-        return ConsoleListener.super.processCommand(console, code, logger);
+    protected List<ConsoleCommand> createCommands() {
+        return Arrays.asList(
+                SystemCommands.HELP,
+                new ConsoleCommand("-status", "Print status") {
+                    @Override
+                    public boolean execute(ConsoleListener listener, BufferedReader console, Logger logger) throws Exception {
+                        printStatus(logger);
+                        return true;
+                    }
+                },
+                new ConsoleCommand("-start", "Start service") {
+                    @Override
+                    public boolean execute(ConsoleListener listener, BufferedReader console, Logger logger) throws Exception {
+                        start();
+                        printStatus(logger);
+                        return true;
+                    }
+                },
+                new ConsoleCommand("-stop", "Stop service") {
+                    @Override
+                    public boolean execute(ConsoleListener listener, BufferedReader console, Logger logger) throws Exception {
+                        stop();
+                        printStatus(logger);
+                        return true;
+                    }
+                },
+                SystemCommands.SET_PROPERTY,
+                new Exit("Quit " + getName())
+        );
     }
 }

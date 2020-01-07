@@ -2,6 +2,7 @@ package shapranv.shell.utils.application.console;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
+import shapranv.shell.utils.application.console.command.ConsoleCommand;
 
 public class ConsoleUtils {
     public static final String FOOTER_LINE = "------------------------------------------";
