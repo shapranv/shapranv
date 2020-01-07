@@ -16,6 +16,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static shapranv.shell.utils.MathUtils.getPercentage;
 import static shapranv.shell.utils.http.RequestParameter.*;
 
 @Log4j2
@@ -133,8 +134,8 @@ public class FlightService extends HttpDataLoader {
     @Override
     protected int getCacheSize() {
         return context.loadedFares.values().stream()
-                .map(fares -> fares.values().stream().map(Map::size).reduce(0, Integer::sum)
-                ).reduce(0, Integer::sum);
+                .map(fares -> fares.values().stream().map(Map::size).reduce(0, Integer::sum))
+                .reduce(0, Integer::sum);
     }
 
     private void resendRequest(long requestId) {
@@ -149,7 +150,7 @@ public class FlightService extends HttpDataLoader {
         int loaded = context.loadedFaresCounter.get();
 
         if (loaded < total) {
-            logger.info("Loading progress: {}% [{}/{}]", (int)(((double)loaded / total) * 100), loaded, total);
+            logger.info("Loading progress: {}% [{}/{}]", getPercentage(loaded, total), loaded, total);
         } else {
             logger.info("Loading finished: [{}/{}]", loaded, total);
         }
