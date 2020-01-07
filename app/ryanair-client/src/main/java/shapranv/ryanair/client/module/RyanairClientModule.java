@@ -10,20 +10,18 @@ import shapranv.shell.utils.application.module.Module;
 
 @Log4j2
 public class RyanairClientModule implements Module {
+    private ServiceRegistry serviceRegistry;
     private AirportService airportService;
-    private RouteService routeService;
-    private FlightService flightService;
-    //private AvailabilityService availabilityService;
 
     @Override
     public void start(Environment env) {
-        ServiceRegistry serviceRegistry = env.ensureService(ServiceRegistry.class);
+        this.serviceRegistry = env.ensureService(ServiceRegistry.class);
 
         this.airportService = new AirportService();
         serviceRegistry.register(airportService);
         env.addService(airportService, AirportService.class);
 
-        this.routeService = new RouteService(airportService);
+        RouteService routeService = new RouteService(airportService);
         serviceRegistry.register(routeService);
         airportService.addUpdateListener(routeService::onAirportsUpdated);
 
@@ -32,7 +30,7 @@ public class RyanairClientModule implements Module {
         routeService.addUpdateListener(availabilityService::onRoutesUpdated);
         */
 
-        this.flightService = new FlightService(airportService, routeService);
+        FlightService flightService = new FlightService(airportService, routeService);
         serviceRegistry.register(flightService);
         routeService.addUpdateListener(flightService::onRoutesUpdated);
     }
@@ -46,12 +44,8 @@ public class RyanairClientModule implements Module {
 
     @Override
     public void stop() {
-        if (flightService != null) {
-            //TODO: Move to ServiceRegistry?
-            airportService.stop();
-            routeService.stop();
-            flightService.stop();
-            //availabilityService.stop();
+        if (serviceRegistry != null) {
+            serviceRegistry.stopAll();
         }
     }
 }

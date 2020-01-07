@@ -61,4 +61,8 @@ public class ServiceRegistry extends ConsoleListener {
         }
         super.printMenu(logger);
     }
+
+    public void stopAll() {
+        services.forEach(Service::stop);
+    }
 }
