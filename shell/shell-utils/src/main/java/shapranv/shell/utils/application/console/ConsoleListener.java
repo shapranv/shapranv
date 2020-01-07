@@ -1,9 +1,9 @@
 package shapranv.shell.utils.application.console;
 
+import org.apache.logging.log4j.Logger;
 import shapranv.shell.utils.application.config.ConfigService;
 
 import java.io.BufferedReader;
-import java.util.function.Consumer;
 
 import static shapranv.shell.utils.application.console.ConsoleUtils.FOOTER_LINE;
 import static shapranv.shell.utils.application.console.ConsoleUtils.getHeader;
@@ -11,13 +11,13 @@ import static shapranv.shell.utils.application.console.ConsoleUtils.getHeader;
 public interface ConsoleListener {
     String getName();
 
-    default void listen(BufferedReader console, Consumer<String> printer) {
-        printHelp(printer);
+    default void listen(BufferedReader console, Logger logger) {
+        printHelp(logger);
 
         while (true) {
             try {
                 String command = console.readLine();
-                if(!processCommand(console, command, printer)) {
+                if(!processCommand(console, command, logger)) {
                     break;
                 }
             } catch (Exception e) {
@@ -26,35 +26,35 @@ public interface ConsoleListener {
         }
     }
 
-    default void printHelp(Consumer<String> printer) {
-        printer.accept(getHeader(getName()));
-        printMenu(printer);
-        printer.accept(FOOTER_LINE);
+    default void printHelp(Logger logger) {
+        logger.info(getHeader(getName()));
+        printMenu(logger);
+        logger.info(FOOTER_LINE);
     }
 
-    default void printMenu(Consumer<String> printer) {
+    default void printMenu(Logger logger) {
         //do nothing
     }
 
-    default void printStatus(Consumer<String> printer) {
+    default void printStatus(Logger logger) {
         //do nothing
     }
 
-    default boolean processCommand(BufferedReader console, String command, Consumer<String> printer) throws Exception {
+    default boolean processCommand(BufferedReader console, String command, Logger logger) throws Exception {
         switch (ConsoleCommand.findByCode(command)) {
             case EXIT:
                 return false;
             case SET_PROPERTY:
-                printer.accept("Property:");
+                logger.info("Property:");
                 String property = console.readLine();
-                printer.accept("Value:");
+                logger.info("Value:");
                 String value = console.readLine();
                 ConfigService.getInstance().setProperty(property, value);
-                printer.accept("System property updated: " + property + "=" + value);
+                logger.info("System property updated: " + property + "=" + value);
                 return true;
             case UNDEF:
             case HELP:
-                printHelp(printer);
+                printHelp(logger);
                 break;
         }
 

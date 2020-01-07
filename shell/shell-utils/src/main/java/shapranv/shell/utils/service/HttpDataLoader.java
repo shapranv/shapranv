@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import shapranv.shell.utils.Ticker;
 import shapranv.shell.utils.application.config.ConfigService;
 import shapranv.shell.utils.application.console.ConsoleCommand;
@@ -17,7 +18,6 @@ import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 
 import static shapranv.shell.utils.application.console.ConsoleUtils.printCommandInfo;
 
@@ -99,51 +99,49 @@ public abstract class HttpDataLoader implements Service, ConsoleListener {
     }
 
     @Override
-    public void printStatus(Consumer<String> printer) {
-        printer.accept(
-                "Service status: active [" + isActive.get() + "], " +
-                        "cache size [" + getCacheSize() + "], " +
-                        "last updated [" + (lastUpdateTime.get() == null ? "" : lastUpdateTime.get()) + "]"
+    public void printStatus(Logger logger) {
+        logger.info("Service status: active [{}], cache size [{}], last updated [{}]",
+                isActive.get(), getCacheSize(), (lastUpdateTime.get() == null ? "" : lastUpdateTime.get())
         );
     }
 
     @Override
-    public void printHelp(Consumer<String> printer) {
-        ConsoleListener.super.printHelp(printer);
-        printStatus(printer);
+    public void printHelp(Logger logger) {
+        ConsoleListener.super.printHelp(logger);
+        printStatus(logger);
     }
 
     @Override
-    public void printMenu(Consumer<String> printer) {
-        printCommandInfo(ConsoleCommand.STATUS, printer);
-        printCommandInfo(ConsoleCommand.START_SERVICE, printer);
-        printCommandInfo(ConsoleCommand.STOP_SERVICE, printer);
-        printCommandInfo(ConsoleCommand.SET_PROPERTY, printer);
-        printCommandInfo(ConsoleCommand.EXIT, "Quit " + getName(), printer);
+    public void printMenu(Logger logger) {
+        printCommandInfo(ConsoleCommand.STATUS, logger);
+        printCommandInfo(ConsoleCommand.START_SERVICE, logger);
+        printCommandInfo(ConsoleCommand.STOP_SERVICE, logger);
+        printCommandInfo(ConsoleCommand.SET_PROPERTY, logger);
+        printCommandInfo(ConsoleCommand.EXIT, "Quit " + getName(), logger);
     }
 
     @Override
-    public boolean processCommand(BufferedReader console, String code, Consumer<String> printer) throws Exception {
+    public boolean processCommand(BufferedReader console, String code, Logger logger) throws Exception {
         ConsoleCommand command = ConsoleCommand.findByCode(code);
 
         switch (command) {
             case STATUS:
-                printStatus(printer);
+                printStatus(logger);
                 return true;
             case START_SERVICE:
                 start();
-                printStatus(printer);
+                printStatus(logger);
                 return true;
             case STOP_SERVICE:
                 stop();
-                printStatus(printer);
+                printStatus(logger);
                 return true;
             case UNDEF:
-                printer.accept("Unknown command...");
-                printHelp(printer);
+                logger.info("Unknown command...");
+                printHelp(logger);
                 return true;
         }
 
-        return ConsoleListener.super.processCommand(console, code, printer);
+        return ConsoleListener.super.processCommand(console, code, logger);
     }
 }

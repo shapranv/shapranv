@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import shapranv.shell.utils.application.config.ConfigService;
 import shapranv.shell.utils.application.config.ConfigUtils;
 import shapranv.shell.utils.application.console.ConsoleClient;
+import shapranv.shell.utils.application.console.ConsoleLogger;
 import shapranv.shell.utils.application.console.ServiceRegistry;
 import shapranv.shell.utils.application.module.Module;
 import shapranv.shell.utils.application.module.ModuleDefinition;
@@ -79,7 +80,7 @@ public class Application {
     private static void startConsoleClient(String appName) {
         BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
         ConsoleClient consoleClient = new ConsoleClient(appName);
-        consoleClient.listen(console, System.out::println);
+        consoleClient.listen(console, ConsoleLogger.getLogger());
     }
 
     private static void stopApplication() {

@@ -1,9 +1,9 @@
 package shapranv.shell.utils.application.console;
 
+import org.apache.logging.log4j.Logger;
 import shapranv.shell.utils.application.Environment;
 
 import java.io.BufferedReader;
-import java.util.function.Consumer;
 
 import static shapranv.shell.utils.application.console.ConsoleUtils.printCommandInfo;
 
@@ -24,24 +24,24 @@ public class ConsoleClient implements ConsoleListener {
     }
 
     @Override
-    public boolean processCommand(BufferedReader console, String code, Consumer<String> printer) throws Exception {
+    public boolean processCommand(BufferedReader console, String code, Logger logger) throws Exception {
         ConsoleCommand command = ConsoleCommand.findByCode(code);
 
         switch (command) {
             case SERVICES:
-                serviceRegistry.listen(console, printer);
-                printHelp(printer);
+                serviceRegistry.listen(console, logger);
+                printHelp(logger);
                 return true;
         }
 
-        return ConsoleListener.super.processCommand(console, code, printer);
+        return ConsoleListener.super.processCommand(console, code, logger);
     }
 
     @Override
-    public void printMenu(Consumer<String> printer) {
-        printCommandInfo(ConsoleCommand.HELP, printer);
-        printCommandInfo(ConsoleCommand.SERVICES, printer);
-        printCommandInfo(ConsoleCommand.SET_PROPERTY, printer);
-        printCommandInfo(ConsoleCommand.EXIT, printer);
+    public void printMenu(Logger logger) {
+        printCommandInfo(ConsoleCommand.HELP, logger);
+        printCommandInfo(ConsoleCommand.SERVICES, logger);
+        printCommandInfo(ConsoleCommand.SET_PROPERTY, logger);
+        printCommandInfo(ConsoleCommand.EXIT, logger);
     }
 }

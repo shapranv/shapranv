@@ -1,8 +1,7 @@
 package shapranv.shell.utils.application.console;
 
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.function.Consumer;
+import org.apache.logging.log4j.Logger;
 
 public class ConsoleUtils {
     public static final String FOOTER_LINE = "------------------------------------------";
@@ -18,11 +17,11 @@ public class ConsoleUtils {
         return prefix + " " + serviceName + " " + suffix;
     }
 
-    public static void printCommandInfo(ConsoleCommand command, Consumer<String> printer) {
-        printCommandInfo(command, command.getDescription(), printer);
+    public static void printCommandInfo(ConsoleCommand command, Logger logger) {
+        printCommandInfo(command, command.getDescription(), logger);
     }
 
-    public static void printCommandInfo(ConsoleCommand command, String description, Consumer<String> printer) {
-        printer.accept("[" + command.getCode() + "] " + description);
+    public static void printCommandInfo(ConsoleCommand command, String description, Logger logger) {
+        logger.info("[{}] {}", command.getCode(), description);
     }
 }
