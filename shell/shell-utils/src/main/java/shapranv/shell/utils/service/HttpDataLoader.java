@@ -1,7 +1,9 @@
 package shapranv.shell.utils.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import shapranv.shell.utils.Ticker;
 import shapranv.shell.utils.application.config.ConfigService;
 import shapranv.shell.utils.application.console.ConsoleCommand;
@@ -20,7 +22,7 @@ import java.util.function.Consumer;
 import static shapranv.shell.utils.application.console.ConsoleUtils.printCommandInfo;
 
 @Log4j2
-public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
+public abstract class HttpDataLoader implements Service, ConsoleListener {
     private final String configKey;
     private final HttpClient httpClient;
     private final Ticker ticker;
@@ -33,7 +35,7 @@ public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
 
     private final AtomicLong requestId = new AtomicLong(0);
 
-    public HttpStaticDataLoader(String configKey) {
+    public HttpDataLoader(String configKey) {
         ConfigService config = ConfigService.getInstance();
         this.configKey = configKey;
         this.httpClient = new HttpClient();
@@ -45,6 +47,7 @@ public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
 
         this.objectMapper = new ObjectMapper();
         this.objectMapper.writerWithDefaultPrettyPrinter();
+        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     private Duration getTickerPeriod() {
@@ -56,7 +59,14 @@ public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
     protected void loadData() {
         try {
             long requestId = this.requestId.incrementAndGet();
-            httpClient.asyncCall(requestId, getHttpRequest(requestId), (id, response) -> {
+            String request = getHttpRequest(requestId);
+
+            if (StringUtils.isBlank(request)) {
+                log.info("Request is empty. Skipping...");
+                return;
+            }
+
+            httpClient.asyncCall(requestId, request, (id, response) -> {
                 refreshCache(id, response);
                 lastUpdateTime.set(LocalDateTime.now());
             });
@@ -65,6 +75,7 @@ public abstract class HttpStaticDataLoader implements Service, ConsoleListener {
         }
     }
 
+    //TODO: Upgrade String->Object
     protected abstract String getHttpRequest(long requestId);
 
     protected abstract void refreshCache(long requestId, String httpResponse);

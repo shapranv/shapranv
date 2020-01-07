@@ -34,7 +34,8 @@ public class HttpClient {
         FutureCallback<String> future = new FutureCallback<String>() {
             @Override
             public void completed(String result) {
-                log.info("Http request response: {}", result);
+                log.info("Http request completed: {}", uri);
+                log.debug("Http response received: {}", result);
                 consumer.accept(requestId, result);
             }
 

@@ -1,32 +1,38 @@
-package shapranv.ryanair.client.module.service;
+package shapranv.ryanair.client.service;
 
 import com.fasterxml.jackson.databind.JavaType;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
-import shapranv.ryanair.client.module.api.domain.Airport;
-import shapranv.ryanair.client.module.api.domain.Route;
+import shapranv.ryanair.client.api.domain.Route;
 import shapranv.shell.utils.collections.CollectionUtils;
-import shapranv.shell.utils.service.HttpStaticDataLoader;
+import shapranv.shell.utils.service.HttpDataLoader;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static shapranv.shell.utils.http.RequestParameter.*;
 
 @Log4j2
-public class RouteService extends HttpStaticDataLoader {
+public class RouteService extends HttpDataLoader {
     private final JavaType inputType;
+
+    private final AirportService airportService;
 
     private final Map<String, List<Route>> routes = CollectionUtils.concurrentMap();
 
     private final Queue<String> airportsToLoad = new LinkedBlockingQueue<>();
     private final Map<Long, String> currentlyLoading = CollectionUtils.concurrentMap();
 
-    public RouteService() {
+    private final Set<Runnable> updateListeners = CollectionUtils.setFromConcurrentMap();
+
+    public RouteService(AirportService airportService) {
         super("routes");
+        this.airportService = airportService;
         this.inputType = objectMapper.getTypeFactory().constructCollectionType(List.class, Route.class);
+    }
+
+    public void addUpdateListener(Runnable updateListener) {
+        this.updateListeners.add(updateListener);
     }
 
     @Override
@@ -34,9 +40,9 @@ public class RouteService extends HttpStaticDataLoader {
         return "Routes service";
     }
 
-    public void onAirportsUpdated(Map<String, Airport> airports) {
+    public void onAirportsUpdated() {
         if (airportsToLoad.isEmpty()) {
-            airports.keySet().forEach(airportsToLoad::offer);
+            airportService.getAllAirportCodes().forEach(airportsToLoad::offer);
             start();
         } else {
             log.warn("Airports are still loading. Skipping update...");
@@ -48,6 +54,7 @@ public class RouteService extends HttpStaticDataLoader {
         if (airportsToLoad.isEmpty() && currentlyLoading.isEmpty()) {
             log.warn("Airports loaded. Stopping service...");
             stop();
+            updateListeners.forEach(Runnable::run);
         } else {
             super.loadData();
         }
@@ -55,6 +62,10 @@ public class RouteService extends HttpStaticDataLoader {
 
     @Override
     protected String getHttpRequest(long requestId) {
+        if (airportsToLoad.isEmpty()) {
+            return null;
+        }
+
         currentlyLoading.put(requestId, airportsToLoad.peek());
         return requestBuilder.clear()
                 .addParam(ARRIVAL_PHRASE, StringUtils.EMPTY)
@@ -66,7 +77,7 @@ public class RouteService extends HttpStaticDataLoader {
     @Override
     protected void refreshCache(long requestId, String httpResponse) {
         if (StringUtils.isBlank(httpResponse)) {
-            reload(requestId);
+            resendRequest(requestId);
             return;
         }
 
@@ -76,16 +87,16 @@ public class RouteService extends HttpStaticDataLoader {
             update = objectMapper.readValue(httpResponse, inputType);
         } catch (Exception e) {
             log.error("Can't process http response", e);
-            reload(requestId);
+            resendRequest(requestId);
             return;
         }
 
         String airportCode = currentlyLoading.remove(requestId);
         routes.put(airportCode, update);
-        log.error("Routes from {} updated. [{}] destinations loaded.", airportCode, update.size());
+        log.info("Routes from {} updated. [{}] destinations loaded.", airportCode, update.size());
     }
 
-    private void reload(long requestId) {
+    private void resendRequest(long requestId) {
         airportsToLoad.add(currentlyLoading.get(requestId));
         currentlyLoading.remove(requestId);
     }
@@ -93,5 +104,12 @@ public class RouteService extends HttpStaticDataLoader {
     @Override
     protected int getCacheSize() {
         return routes.values().stream().map(List::size).reduce(0, Integer::sum);
+    }
+
+    public List<Route> getRoutesFrom(String airport) {
+        if (!routes.containsKey(airport)) {
+            log.error("Unknown airport code: {}", airport);
+        }
+        return routes.getOrDefault(airport, Collections.emptyList());
     }
 }
