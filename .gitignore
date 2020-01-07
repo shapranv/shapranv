@@ -7,7 +7,6 @@ logs/
 *.trace
 
 # Packages
-*.jar
 *.war
 *.ear
 *.zip
